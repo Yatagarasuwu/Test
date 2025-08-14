@@ -64,27 +64,8 @@ public class Main {
 
             ControllerState state = controllers.getState(0);
             String pressedButton = getNewlyPressedButton(state, prevState);
-            if (pressedButton != null && !pressedButton.equals("dpadDown") && !pressedButton.equals("dpadUp") && !pressedButton.equals("dpadLeft") && !pressedButton.equals("dpadRight")) {
-                if (pressedButton.equals("start")) {
-                    System.out.println("Exiting freeplay mode.");
-                    fortnite = false;
-                } else {
-                    // Find FG equivalent
-                    String fgButton = null;
-                    for (String key : buttonMappings.keySet()) {
-                        if (buttonMappings.get(key).equalsIgnoreCase(pressedButton)) {
-                            fgButton = key;
-                            break;
-                        }
-                    }
-                    if (fgButton != null) {
-                        System.out.println("You pressed: "  + fgButton + ")");
-                    } else {
-                        System.out.println("You pressed: " + pressedButton + " (no FG equivalent assigned)");
-                    }
-                }
-            }
-            // Movement inputs.  Only left stick and dpad, nothing else wacky.
+
+             // Movement inputs.  Only left stick and dpad, nothing else wacky.
                 float threshold = 0.5f; // Just in case i wanna change this later, might as well integrate now
                 int numpad = 5;  
               
@@ -101,12 +82,33 @@ public class Main {
                     else if (state.leftStickX < -threshold || state.dpadLeft) numpad = 4;  
                      else numpad = 5; 
                 }
-              // Only print if new direction pls
-        if (numpad != prevNumpad && numpad != 5) {
-            System.out.println(numpad);
-        }
+        //       // Only print if new direction pls
+        // if (numpad != prevNumpad && numpad != 5) {
+        //     System.out.println(numpad);
+        // }
             prevNumpad = numpad;
             prevState = state;
+            
+            if (pressedButton != null && !pressedButton.equals("dpadDown") && !pressedButton.equals("dpadUp") && !pressedButton.equals("dpadLeft") && !pressedButton.equals("dpadRight")) {
+                if (pressedButton.equals("start")) {
+                    System.out.println("Exiting freeplay mode.");
+                    fortnite = false;
+                } else {
+                    // Find FG equivalent
+                    String fgButton = null;
+                    for (String key : buttonMappings.keySet()) {
+                        if (buttonMappings.get(key).equalsIgnoreCase(pressedButton)) {
+                            fgButton = key;
+                            break;
+                        }
+                    }
+                    if (fgButton != null) {
+                        System.out.println("You pressed: " + numpad +  fgButton);
+                    } else {
+                        System.out.println("You pressed: " + pressedButton + " (no FG equivalent assigned)");
+                    }
+                }
+            }
             
          
         }
