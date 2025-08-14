@@ -20,10 +20,19 @@ public class Main {
         buttonAssigner(controllers, buttonMappings, "S");
          System.out.println("Button you want to assign to HS.");
         buttonAssigner(controllers, buttonMappings, "HS");
+          System.out.println("Button you want to assign to D.");
+        buttonAssigner(controllers, buttonMappings, "D");
+
+
 
 
         // You can print the mapping to verify
         System.out.println("Button mappings: " + buttonMappings);
+
+        System.out.println("Now that your buttons are assigned, this is a freeplay zone. Press a button and the terminal will display it's FG equivalent!");
+        System.out.println("Press your controllers start button to end freeplay.");
+        freeplay(controllers, buttonMappings);
+        
         controllers.quitSDLGamepad();
     }
 
@@ -42,6 +51,40 @@ public class Main {
                 buttonPressed = true;
             }
             prevState = state;
+        }
+    }
+
+    // Freeplay mode: print mapped FG equivalent for each button press, exit on start
+    public static void freeplay(ControllerManager controllers, HashMap<String, String> buttonMappings) {
+        ControllerState prevState = controllers.getState(0);
+        boolean fortnite = true;
+        while (fortnite) {
+            controllers.update();
+            ControllerState state = controllers.getState(0);
+            String pressedButton = getNewlyPressedButton(state, prevState);
+            if (pressedButton != null) {
+                if (pressedButton.equals("start")) {
+                    System.out.println("Exiting freeplay mode.");
+                    fortnite = false;
+                } else {
+                    // Find FG equivalent
+                    String fgButton = null;
+                    for (String key : buttonMappings.keySet()) {
+                        if (buttonMappings.get(key).equalsIgnoreCase(pressedButton)) {
+                            fgButton = key;
+                            break;
+                        }
+                    }
+                    if (fgButton != null) {
+                        System.out.println("You pressed: "  + fgButton + ")");
+                    } else {
+                        System.out.println("You pressed: " + pressedButton + " (no FG equivalent assigned)");
+                    }
+                }
+            }
+            prevState = state;
+            // Small sleep to avoid spamming
+            try { Thread.sleep(50); } catch (InterruptedException e) { }
         }
     }
 
