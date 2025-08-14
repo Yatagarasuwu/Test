@@ -29,7 +29,7 @@ public class Main {
         // You can print the mapping to verify
         System.out.println("Button mappings: " + buttonMappings);
 
-        System.out.println("Now that your buttons are assigned, this is a freeplay zone. Press a button and the terminal will display it's FG equivalent!");
+        System.out.println("Now that your buttons are assigned, this is a freeplay zone. Press a button and the terminal will display it's FG equivalent! Motions also work.");
         System.out.println("Press your controllers start button to end freeplay.");
         freeplay(controllers, buttonMappings);
         
@@ -54,15 +54,17 @@ public class Main {
         }
     }
 
-    // Freeplay mode: print mapped FG equivalent for each button press, exit on start
+    // Hardest method so far. Supports a loop for all buttons and motions. No combined motions yet (236 for example).
     public static void freeplay(ControllerManager controllers, HashMap<String, String> buttonMappings) {
         ControllerState prevState = controllers.getState(0);
         boolean fortnite = true;
+           int prevNumpad = 5;
         while (fortnite) {
             controllers.update();
+
             ControllerState state = controllers.getState(0);
             String pressedButton = getNewlyPressedButton(state, prevState);
-            if (pressedButton != null) {
+            if (pressedButton != null && !pressedButton.equals("dpadDown") && !pressedButton.equals("dpadUp") && !pressedButton.equals("dpadLeft") && !pressedButton.equals("dpadRight")) {
                 if (pressedButton.equals("start")) {
                     System.out.println("Exiting freeplay mode.");
                     fortnite = false;
@@ -82,9 +84,31 @@ public class Main {
                     }
                 }
             }
+            // Movement inputs.  Only left stick and dpad, nothing else wacky.
+                float threshold = 0.5f; // Just in case i wanna change this later, might as well integrate now
+                int numpad = 5;  
+              
+                if (state.leftStickY > threshold || state.dpadUp) {  
+                    if (state.leftStickX > threshold || state.dpadRight) numpad = 9;  
+                    else if (state.leftStickX < -threshold || state.dpadLeft) numpad = 7;  
+                    else numpad = 8;  
+                } else if (state.leftStickY < -threshold || state.dpadDown) {  
+                    if (state.leftStickX > threshold || state.dpadRight) numpad = 3;  
+                    else if (state.leftStickX < -threshold || state.dpadLeft) numpad = 1;  
+                    else numpad = 2; // Down
+                } else {
+                    if (state.leftStickX > threshold || state.dpadRight) numpad = 6;  
+                    else if (state.leftStickX < -threshold || state.dpadLeft) numpad = 4;  
+                     else numpad = 5; 
+                }
+              // Only print if new direction pls
+        if (numpad != prevNumpad && numpad != 5) {
+            System.out.println(numpad);
+        }
+            prevNumpad = numpad;
             prevState = state;
-            // Small sleep to avoid spamming
-            try { Thread.sleep(50); } catch (InterruptedException e) { }
+            
+         
         }
     }
 
